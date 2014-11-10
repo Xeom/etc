@@ -1,0 +1,6 @@
+(setq 
+	tetris-score-file
+		"~/.emacs.d/tetrisscores"
+	c-default-style
+		"linux"
+)
