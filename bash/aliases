@@ -32,8 +32,11 @@ alias font='sudo dpkg-reconfigure console-setup'
 
 alias t='tmux'
 
+alias ta='tmux attach'
+
 alias i='irssi'
 
 # Very important
+
 alias gorramnitkaylee,='sudo'
 

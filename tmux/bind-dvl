@@ -47,11 +47,4 @@ bind -r K resize-pane -D
 
 bind Pageup copy-mode
 
-bind 1\
-	source-file .tmux.bind\;\
-	display-message "Switched to DVL configuration."
-
-bind 2\
-	source-file .tmux.bind.qwerty\;\
-	display-message "Switched to Qwerty configuration."
-
+source-file etc/tmux/layouts

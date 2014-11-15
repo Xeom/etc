@@ -1,0 +1,59 @@
+URxvt.scrollBar:          off
+URxvt*font:               -benis-uushi-medium-r-normal--11-90-75-75-p-58-iso10646-1
+URxvt*boldFont:           -benis-uushi-medium-r-normal--11-90-75-75-p-58-iso10646-1
+URxvt*letterSpace:        0
+URxvt.internalBorder:     1
+URxvt*selectToClipboard:  true
+URxvt*saveLines:          10000
+
+URxvt.perl-ext-common:    default,matcher,searchable-scrollback
+URxvt.urlLauncher:        /usr/bin/google-chrome-stable
+URxvt.matcher.button:     1
+
+! black background and white foreground
+*background: #121218
+*foreground: #D0D0D0
+
+! +---------+
+! | Colours |
+! +---------+
+
+! black
+*color0: #121218
+! dark gray
+*color8: #404040
+
+! red
+*color1: #EE2222
+! brown
+*color9: #CC4422
+
+! green
+*color2: #338805
+! lime-green
+*color10: #44FF22
+
+! orange
+*color3: #EE6610
+! yellow
+*color11: #EEEE66
+
+! blue
+*color4: #2233FF
+! light blue
+*color12: #5570FE
+
+! magenta
+*color5: #DD33FF
+! pink
+*color13: #FF55FF
+
+! cyan
+*color6: #20BFFF
+! sky-blue
+*color14: #66FFFF
+
+! white
+*color7: #D0D0D0
+! bright white
+*color15: #FFFFFF

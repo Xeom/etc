@@ -3,7 +3,7 @@
 xset fp+ ~/misc/fonts
 
 # Load settings for urxvt
-xrdb -merge ~/etc/urxvt/xdb
+xrdb -merge .Xresources
 
 # Start i3
 exec i3

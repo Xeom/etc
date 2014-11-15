@@ -3,5 +3,5 @@ bind 1\
 	display-message "Switched to DVL configuration."
 
 bind 2\
-	source-file .tmux.bind.qwerty\;\
+	source-file etc/tmux/bind-qwerty\;\
 	display-message "Switched to Qwerty configuration."
