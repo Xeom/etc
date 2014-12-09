@@ -1,6 +1,6 @@
 # For some reason, fonts won't work, 
 # this will fix them.
-xset fp+ ~/misc/fonts
+xset fp+ ~/oth/fonts
 
 # Load settings for urxvt
 xrdb -merge .Xresources

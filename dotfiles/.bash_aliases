@@ -24,6 +24,8 @@ alias ll='ls -lh'
 # Shorthand for displaying a directory tree
 alias lr='tree -d'
 
+alias lsz='du -hd0'
+
 #+-------+
 #| Other |
 #+-------+
