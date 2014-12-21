@@ -12,7 +12,7 @@ URxvt.matcher.button:     1
 
 ! black background and white foreground
 *background: #121218
-*foreground: #D0D0D0
+*foreground: #d0d0d0
 
 ! +---------+
 ! | Colours |
@@ -24,36 +24,37 @@ URxvt.matcher.button:     1
 *color8: #404040
 
 ! red
-*color1: #EE2222
+*color1: #ee2222
 ! brown
-*color9: #CC4422
+*color9: #cc4422
 
 ! green
 *color2: #338805
 ! lime-green
-*color10: #44FF22
+*color10: #44ff22
 
 ! orange
-*color3: #EE6610
+*color3: #ee6610
 ! yellow
-*color11: #EEEE66
+*color11: #eeee66
 
 ! blue
-*color4: #2233FF
+*color4: #2233ff
 ! light blue
-*color12: #5570FE
+*color12: #5570fe
 
 ! magenta
-*color5: #DD33FF
+*color5: #dd33ff
 ! pink
-*color13: #FF55FF
+*color13: #ff55ff
 
 ! cyan
-*color6: #20BFFF
+*color6: #20bfff
 ! sky-blue
-*color14: #66FFFF
+*color14: #66ffff
 
 ! white
-*color7: #D0D0D0
+*color7: #d0d0d0
 ! bright white
-*color15: #FFFFFF
+*color15: #ffffff
+
