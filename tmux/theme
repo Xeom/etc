@@ -1,4 +1,4 @@
-c_sb="green"
+c_sb="blue"
 c_hl="black"
 c_txt="white"
 
@@ -26,9 +26,8 @@ set -g history-limit 25000
 
 set -g status-right-length 45
 set -g status-right "\
-${split} #(free -h | grep 'buffers/cache' | awk '{print $3}')iB \
-${split} #(acpi | cut -d: -f2 | cut -d, -f-2 | tr -d ' ' | sed 's/Charging,/>\ /' | sed 's/Discharging,/<\ /' | sed 's/Unknown,/?\ /' | sed 's/Full,/-\ /') \
-${split} #(acpi -t | cut -d, -f2 | awk '{print $1}' | cut -d. -f1)C \
+${split} #(free -h | grep 'buffers/cache' | awk '{printf $3}')iB \
+${split} #(baticon) \
 ${split} %Y-%m-%d %H:%M "
 
 set -g status-left-length 30	

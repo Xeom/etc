@@ -9,7 +9,7 @@ servers = (
     address = "irc.nixers.net";
     chatnet = "nixers";
     port = "6667";
-    autoconnect = "yes";
+    autoconnect = "no";
   }
 );
 
@@ -153,6 +153,7 @@ settings = {
     hilight_color = "%y";
     hilight_level = "MSGS DCCMSGS";
     hilight_nick_matches = "yes";
+    theme = "green";
   };
 };
-hilights = ( {} );
+hilights = ( { } );

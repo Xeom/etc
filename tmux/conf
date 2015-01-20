@@ -1,4 +1,4 @@
-source-file etc/tmux/theme
-source-file etc/tmux/bind-dvl
-source-file etc/tmux/layouts
+source-file ~/etc/tmux/theme
+source-file ~/etc/tmux/bind-qwerty
+source-file ~/etc/tmux/layouts
 

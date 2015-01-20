@@ -3,10 +3,10 @@ set $terminal urxvt
 set $mod Mod4
 set $mod2 Mod4+Shift
 
-set $up    q
-set $down  k
-set $left  minus
-set $right c
+set $up    w
+set $down  s
+set $left  a
+set $right d
 
 set $workspace1 home
 set $workspace2 terminal
@@ -25,7 +25,7 @@ floating_modifier $mod
 
 font -benis-uushi-medium-r-normal--11-90-75-75-p-58-iso10646-1
 
-bindsym $mod2+semicolon kill
+bindsym $mod2+q kill
 
 bindsym $mod+$left focus left
 bindsym $mod2+$left move left
@@ -48,44 +48,46 @@ bindsym $mod2+space floating toggle
 #bindsym $mod+t focus parent
 #bindsym $mod+d focus child
 
-bindsym $mod+bracketleft  workspace $workspace1
-bindsym $mod+bracketright workspace $workspace2
-bindsym $mod+slash        workspace $workspace3
-bindsym $mod+p            workspace $workspace4
-bindsym $mod+f            workspace $workspace5
-bindsym $mod+m            workspace $workspace6
-bindsym $mod+l            workspace $workspace7
-bindsym $mod+j            workspace $workspace8
-bindsym $mod+4            workspace $workspace9
-bindsym $mod+3            workspace $workspace10
+bindsym $mod+1 workspace $workspace1
+bindsym $mod+2 workspace $workspace2
+bindsym $mod+3 workspace $workspace3
+bindsym $mod+4 workspace $workspace4
+bindsym $mod+5 workspace $workspace5
+bindsym $mod+6 workspace $workspace6
+bindsym $mod+7 workspace $workspace7
+bindsym $mod+8 workspace $workspace8
+bindsym $mod+9 workspace $workspace9
+bindsym $mod+0 workspace $workspace10
 
-bindsym $mod2+bracketleft  move container to workspace $workspace1
-bindsym $mod2+bracketright move container to workspace $workspace2
-bindsym $mod2+slash        move container to workspace $workspace3
-bindsym $mod2+p            move container to workspace $workspace4
-bindsym $mod2+f            move container to workspace $workspace5
-bindsym $mod2+m            move container to workspace $workspace6
-bindsym $mod2+l            move container to workspace $workspace7
-bindsym $mod2+j            move container to workspace $workspace8
-bindsym $mod2+4            move container to workspace $workspace9
-bindsym $mod2+3            move container to workspace $workspace10
+bindsym $mod2+1 move container to workspace $workspace1
+bindsym $mod2+2 move container to workspace $workspace2
+bindsym $mod2+3 move container to workspace $workspace3
+bindsym $mod2+4 move container to workspace $workspace4
+bindsym $mod2+5 move container to workspace $workspace5
+bindsym $mod2+6 move container to workspace $workspace6
+bindsym $mod2+7 move container to workspace $workspace7
+bindsym $mod2+8 move container to workspace $workspace8
+bindsym $mod2+9 move container to workspace $workspace9
+bindsym $mod2+0 move container to workspace $workspace10
 
-bindsym $mod2+Y reload
+bindsym $mod2+R reload
 bindsym $mod2+B exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
-bindsym $mod+g exec dmenu_run
+bindsym $mod+c exec dmenu_run
 
-bindsym XF86AudioRaiseVolume exec amixer set Master on 1%+
-bindsym XF86AudioLowerVolume exec amixer set Master on 1%-
-bindsym XF86AudioMute        exec amixer set Master toggle
+bindsym XF86MonBrightnessDown exec xbacklight -dec 5
+bindsym XF86MonBrightnessUp   exec xbacklight -inc 5
+bindsym XF86AudioRaiseVolume  exec amixer set Master on 1%+
+bindsym XF86AudioLowerVolume  exec amixer set Master on 1%-
+bindsym XF86AudioMute         exec amixer set Master toggle
 
 bindsym $mod+Return exec urxvt
 
 bindsym Print exec screenshot
 
-bindsym $mod+y mode "resize"
+bindsym $mod+r mode "resize"
 
-bindsym $mod+d fullscreen
+bindsym $mod+f fullscreen
 
 mode "resize" {
 	bindsym $down  resize grow   height 10 px or 10 ppt
@@ -101,7 +103,7 @@ bar {
 	mode hide
 }
 
-new_window pixel 2
+new_window pixel 0
 
 assign [class="(?i)google-chrome"] browse
 assign [class="(?i)urxvt"] terminal

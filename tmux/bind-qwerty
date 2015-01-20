@@ -1,7 +1,7 @@
 unbind -a
 
-set -g prefix C-l
-bind C-l send-prefix
+set -g prefix C-k
+bind C-k send-prefix
 
 # For taking 'screenshots' of a sort
 bind-key y\

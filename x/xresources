@@ -6,6 +6,7 @@ URxvt.internalBorder:     1
 URxvt*selectToClipboard:  true
 URxvt*saveLines:          10000
 
+URxvt.borderless:         true
 URxvt.perl-ext-common:    default,matcher,searchable-scrollback
 URxvt.urlLauncher:        /usr/bin/google-chrome-stable
 URxvt.matcher.button:     1
@@ -29,27 +30,27 @@ URxvt.matcher.button:     1
 *color9: #cc4422
 
 ! green
-*color2: #338805
+*color2: #0a5e06
 ! lime-green
 *color10: #44ff22
 
 ! orange
-*color3: #ee6610
+*color3: #ff972a
 ! yellow
 *color11: #eeee66
 
 ! blue
-*color4: #2233ff
+*color4: #4466ff
 ! light blue
 *color12: #5570fe
 
 ! magenta
-*color5: #dd33ff
+*color5: #ff2aa7
 ! pink
 *color13: #ff55ff
 
 ! cyan
-*color6: #20bfff
+*color6: #20bbbb
 ! sky-blue
 *color14: #66ffff
 

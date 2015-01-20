@@ -1,9 +1,10 @@
 # For some reason, fonts won't work, 
 # this will fix them.
 xset fp+ ~/oth/fonts
+xset fp rehash
 
 # Load settings for urxvt
-xrdb -merge .Xresources
+xrdb -merge ~/.Xresources
 
 # Start i3
 exec i3
