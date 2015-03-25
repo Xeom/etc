@@ -1,6 +1,8 @@
 URxvt.scrollBar:          off
 URxvt*font:               -benis-uushi-medium-r-normal--11-90-75-75-p-58-iso10646-1
 URxvt*boldFont:           -benis-uushi-medium-r-normal--11-90-75-75-p-58-iso10646-1
+URxvt*italicFont:         -benis-uushi-medium-r-normal--11-90-75-75-p-58-iso10646-1
+URxvt*boldItalicFont:     -benis-uushi-medium-r-normal--11-90-75-75-p-58-iso10646-1
 URxvt*letterSpace:        0
 URxvt.internalBorder:     1
 URxvt*selectToClipboard:  true
@@ -30,7 +32,8 @@ URxvt.matcher.button:     1
 *color9: #cc4422
 
 ! green
-*color2: #0a5e06
+*color2: #0f8d09
+! 0a5e06
 ! lime-green
 *color10: #44ff22
 

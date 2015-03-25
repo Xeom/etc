@@ -30,8 +30,6 @@ alias lsz='du -hd0'
 #| Other |
 #+-------+
 
-alias font='sudo dpkg-reconfigure console-setup'
-
 alias t='tmux'
 
 alias ta='tmux attach'
