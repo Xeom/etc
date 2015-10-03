@@ -34,9 +34,12 @@ alias t='tmux'
 
 alias ta='tmux attach'
 
-alias i='irssi'
+alias i='irssi | lbell'
 
 # Very important
 
 alias gorramnitkaylee,='sudo'
 
+# Python
+
+alias python=/usr/bin/python3
