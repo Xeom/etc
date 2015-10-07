@@ -27,7 +27,7 @@ set -g history-limit 25000
 set -g status-right-length 45
 set -g status-right "\
 ${split} #(free -h | grep 'buffers/cache' | awk '{printf $3}')iB \
-${split} #(baticon) \
+${split} #(icon-bar) \
 ${split} %Y-%m-%d %H:%M "
 
 set -g status-left-length 30	
