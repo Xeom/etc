@@ -75,15 +75,12 @@ bindsym $mod2+B exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do
 
 bindsym $mod+c exec dmenu_run
 
-bindsym XF86MonBrightnessDown exec xbacklight -dec 5
-bindsym XF86MonBrightnessUp   exec xbacklight -inc 5
 bindsym XF86AudioRaiseVolume  exec amixer set Master on 1%+
 bindsym XF86AudioLowerVolume  exec amixer set Master on 1%-
-bindsym XF86AudioMute         exec amixer set Master toggle
 
 bindsym $mod+Return exec urxvt
 
-bindsym Print exec screenshot
+bindsym Print exec lshot | lclip
 
 bindsym $mod+r mode "resize"
 
@@ -107,3 +104,5 @@ new_window pixel 0
 
 assign [class="(?i)google-chrome"] browse
 assign [class="(?i)urxvt"] terminal
+
+exec --no-startup-id nm-applet
