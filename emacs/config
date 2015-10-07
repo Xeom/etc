@@ -1,29 +1,149 @@
-(setq 
-	tetris-score-file
-		"~/.emacs.d/tetrisscores"
-	c-default-style
-		"linux"
-	c-basic-offset 
-		4
-	tab-width
-		4
-	indent-tabs-mode 
-		t
-)
+(setq
+ tetris-score-file "~/.emacs.d/tetrisscores"
+ c-default-style   "linux"
+ c-basic-offset    4
+ tab-width         4
+ indent-tabs-mode  t)
+
+(if (not column-number-mode)
+    (column-number-mode))
+
+(if (not show-paren-mode)
+    (show-paren-mode))
+
+(setq show-paren-delay 0)
+(set-face-attribute 'show-paren-match nil
+                    :background "#999"
+                    :foreground "#fff")
+
+(setq whitespace-style '(face trailing tabs tab-mark))
+(global-whitespace-mode 1)
+
+(setq-default tab-width 4)
+(defvaralias 'c-basic-offset     'tab-width)
+(defvaralias 'cperl-indent-level 'tab-width)
+
+; Display the size of the currently selected region. Updates when the last
+; command was a cursor move.
+(defun region-stats ()
+  (if (and (region-active-p)                 ; Check that a valid region is selected.
+           (or
+            (eq last-command 'previous-line) ; Check that the last command was a move.
+            (eq last-command 'next-line)
+            (eq last-command 'right-char)
+            (eq last-command 'left-char)))
+
+  (call-interactively
+   'count-words-region)))               ; The gorramn command.
+
+; Shift the selected region (the selection, not the content) by n characters.
+; Negative values shift the region backwards
+(defun region-shift (n)
+  (when (region-active-p)               ; Check that a valid region is selected.
+    (set-mark  (+ n (mark)))            ; Increment mark and point by n.
+    (goto-char (+ n (point)))
+
+    (setq deactivate-mark nil)))        ; Prevent mark killing herself.
+
+; Shift the region selected by one character to the left.
+(defun region-shift-left ()
+  (interactive)
+  (region-shift -1))
+
+; Shift the region selected by one character to the right.
+(defun region-shift-right ()
+  (interactive)
+  (region-shift  1))
+
+; To be called from a hook - Inserts the calling command key(s) at the start
+; of every line of the current selected region rectangle.
+(defun region-insert ()
+
+  (setq char                            ; Get the command string.
+        (concat (this-command-keys)))
+
+  (when (and (region-active-p)          ; Check there is a valid region selected.
+             (eq 1 (length char))       ; Check the character to insert is one long
+             rectangle-mark-mode)       ; Check rectangle mark mode is enabled
+
+    (delete-char -1)                    ; Delete the character that was actually inserted.
+
+    (setq start (region-beginning)      ; Get the bounds of the region.
+          end   (region-end))
+
+    (goto-char start)                   ; Go to the start of the region
+    (setq col (current-column))         ; and get the col.
+
+    (goto-char end)                         ; Go to the end line
+    (move-to-column col)                ; and start column.
+
+    (insert char)                       ; Insert the string.
+    (set-mark  (point))                     ; Start the new selection here.
+
+    (while (> (line-beginning-position) ; Wait until we're on the same row as start.
+              start)
+
+      (next-line -1)                    ; Go up a row.
+
+      (move-to-column col)              ; Go to the start column,
+      (insert char))                    ; and insert.
+
+    (setq deactivate-mark nil)))        ; Again, marks must be explicitly disallowed to suicide.
+
+(add-hook 'activate-mark-hook
+          (lambda ()
+            (add-hook
+             'post-command-hook
+             'region-stats)
+            (add-hook
+             'post-self-insert-hook
+             'region-insert)))
+
+(add-hook 'deactivate-mark-hook
+          (lambda ()
+            (remove-hook
+             'post-command-hook
+             'region-stats)
+            (remove-hook
+             'post-self-insert-hook
+             'region-insert)))
+
+(add-hook 'html-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)))
+
+(add-hook 'lisp-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil)))
+
+(add-hook 'javascript-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode t)
+            (setq tab-width 4)
+            (setq js-indent-level 4)))
 
 (add-hook 'python-mode-hook
-	(lambda ()
-		(setq indent-tabs-mode t)
-		(setq python-indent 4)
-		(setq tab-width 4)
-	)
-)
+          (lambda ()
+            (setq indent-tabs-mode t)
+            (setq python-indent 4)
+            (setq tab-width 4)))
 
-(define-key function-key-map "\eOA" [up])
-(define-key function-key-map "\e[A" [up])
-(define-key function-key-map "\eOB" [down])
-(define-key function-key-map "\e[B" [down])
-(define-key function-key-map "\eOC" [right])
-(define-key function-key-map "\e[C" [right])
-(define-key function-key-map "\eOD" [left])
-(define-key function-key-map "\e[D" [left])
+(setq lola-map
+      (copy-keymap
+       (current-global-map)))
+
+(define-key lola-map (kbd "C-c SPC")      nil)
+(define-key lola-map (kbd "M-SPC")       'rectangle-mark-mode)
+(define-key lola-map (kbd "C-c <left>")  'region-shift-left)
+(define-key lola-map (kbd "C-c <right>") 'region-shift-right)
+
+(use-global-map lola-map)
+
+(global-set-key "\eOA" [up])
+(global-set-key "\e[A" [up])
+(global-set-key "\eOB" [down])
+(global-set-key "\e[B" [down])
+(global-set-key "\eOC" [right])
+(global-set-key "\e[C" [right])
+(global-set-key "\eOD" [left])
+(global-set-key "\e[D" [left])
