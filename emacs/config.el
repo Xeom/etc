@@ -1,72 +1,252 @@
-(setq
- tetris-score-file                           ; Tetris is important for productivity
- "~/.emacs.d/tetrisscores"
+;;-------------------------------------------;;
+;; General helper functions for stuff here   ;;
+;;-------------------------------------------;;
 
- c-default-style                             ; Linux style is important,
- "linux"                                     ; does fuck up #defines tho...
+;; Get the line a particular position is on
+(defun pos-line (position)
+  (save-excursion                            ; Ensure nothing is affected by moving the cursor
+    (goto-char position)                     ; Go to the correct position
+    (beginning-of-line)                      ; and the start of the line
+    (+ 1 (count-lines 1 (point)))))          ; Count the lines up
 
- indent-tabs-mode                            ; TABS MASTER-RACE
- t
+;; Get the column a particular position is in
+(defun pos-col (position)
+  (save-excursion                            ; Ensure nothing is affected by moving the cursor
+    (goto-char position)                     ; Go to the correct position
+    (current-column)))                       ; Return the current column
 
- debug-on-error                              ; Just so we can figure out when things catch fire
- t
+;;-------------------------------------------;;
+;; Functions for region-cursor minor-mode    ;;
+;;-------------------------------------------;;
 
-;; debug-ignored-errors                      ; Uncomment for every goddamn error to produce tracebacks etc.
-;; nil
+;; Performs funct on every line of a multi-line cursor
+(defun rc-apply (funct)
+    (setq col
+          (current-column)                   ; The column of the point is where we will insert.
 
- delete-active-region                        ; We can always C-x u
- t)
+          end-line
+          (pos-line (min (window-end)
+                         (region-end)))      ; Get the last line of the region
 
+          start-line
+          (pos-line (max (window-start)
+                         (region-beginning))); Get the first line of the region
 
+          orig-line
+          (pos-line (point)))                ; Save the line of the original point
 
-(column-number-mode 1)                       ; HOW DO WE ALIGN OTHERWISE ;-;
+    (goto-line end-line)                     ; Go to the end line of the region
+    (move-to-column col)                     ; and the column of the cursor
 
-(set-face-attribute 'show-paren-match nil
-                    :background "#999"
-                    :foreground "#fff")      ; Gray brackets :D
+    (if (eq (current-column) col)            ; If a cursor can be placed in the correct column of
+        (funcall funct))                     ; the first line of the region, call funct
 
+    (while (> (pos-line (point))             ; For every line in the region, going upwards
+              start-line)                    ; this way we avoid changes on prior lines affecting later ones
+      (forward-line -1)
+      (move-to-column col)
 
+      (if (eq (current-column) col)          ; If a cursor can be placed in the correct column of each line
+          (funcall funct)))                  ; call funct
 
-(setq show-paren-delay 0)                    ; Why do you even do that by default ;-;
-(show-paren-mode 1)                          ; This is entirely necessary if using either grace's code or lisp
-
-
-
-(setq whitespace-style
-      '(face trailing tabs tab-mark))        ; Dunno what these do exactly,
-(global-whitespace-mode 1)                   ; but they seem important
-
-
-
-
-(setq-default tab-width 4)                   ; Seriously, 8 spaces is massive, why would you ever use
-(defvaralias 'c-basic-offset     'tab-width) ; it. 4 is so, so much better.
-(defvaralias 'cperl-indent-level 'tab-width)
-
-
-
+    (goto-line orig-line)                    ; Go to the original line of the point
+    (move-to-column col))                    ; and its column. We cannot use the position as it'd be offset.
 
 
-;; Display the sze of the currently selected region. Updates when the last
-;; command was acursor move.
-(defun region-stats ()
+
+;; Squishes a region down to a width of 1. Used after region-insert etc.
+;; To make the region look like a multi-line cursor thing.
+(defun rc-squish ()
   (interactive)
 
-  (if (and (region-active-p)                 ; Check that a valid region is selected.
-           (or
-            (eq this-command 'previous-line) ; Check that the last command was a move.
-            (eq this-command 'next-line)
-            (eq this-command 'right-char)
-            (eq this-command 'left-char)))
-  (call-interactively
-   'count-words-region)))                    ; The gorramn command.
+  (setq cur-col
+        (current-column))                    ; Save the column of the point
+
+  (set-mark (save-excursion                  ; Move the mark
+              (goto-char (mark))             ; to find where to move it to, go to its current position,
+              (move-to-column cur-col)       ; and go to the column of the point.
+              (point))))
 
 
 
+;; Inserts a single character on every line of a region acting as a multi-line cursor
+(defun rc-insert-char (char)
+  (interactive "cCharacter to insert?")      ; This could be useful to call via M-x sometime...
+
+  (rc-apply (lambda ()                       ; For every line in the region,
+              (let (deactivate-mark)         ; making sure we don't deactivate the mark,
+                (insert char))))             ; we insert the character on every line.
+
+  (rc-squish)                                ; Squish the region
+
+  (forward-char))                            ; Go forward a character so we are in front of what we inserted
+
+;; To be called from a keypress when a region is acting as a multiline cursor
+;; Takes the keypress that called it and inserts it on every line of the region in the cursor's column
+(defun rc-insert-command ()
+  (interactive)
+  (when (region-active-p)                    ; Ensure we are dealing with an actual region
+    (setq char
+          (concat (this-command-keys)))
+
+    (when (string-match "[[:print:]]" char)  ; Make sure the character is printable
+      (rc-insert-char char))                 ; Insert the keypresses that called this function
+
+    (when (string= "" char)                ; If the character is enter,
+      (deactivate-mark))))                   ; we get rid of the mark
 
 
+
+;; Causes the region to act as a multi-line cursor and delete the characters in the column behind the cursor
+(defun rc-backspace ()
+  (interactive)
+
+  (when (region-active-p)                    ; Ensure we actually have a region
+    (setq orig-mode delete-active-region     ; Save the original mode of delete-active-region
+          delete-active-region nil)          ; Make it do we do not delete everything in the region
+
+    (backward-char)                          ; Go backwards
+
+    (rc-apply (lambda ()
+                (let (deactivate-mark        ; Ensure we don't kill the region
+                      delete-active-region)
+                  (delete-char 1))))         ; Delete the charater in front of the cursor on each line
+
+    (rc-squish)                              ; Squish the region into a multi-line cursor looking thing
+
+    (setq delete-active-region orig-mode)))  ; Reset delete-active-region to its original mode (probably t)
+
+;; Kills all current multi-line cursor overlays
+(defun kill-rc-overlays ()
+  (dolist (overlay rc-overlays)              ; For every current overlay
+    (delete-overlay overlay))                ; delete the overlay, so it stops displaying
+
+  (setq rc-overlays nil))                    ; Set the list of current overlays to '()
+
+;; Adds a new multi-line cursor overlay at the current point
+(defun new-rc-overlay ()
+  (setq position                             ; Save the current point
+        (point)
+
+        overlay
+        (make-overlay (- position 1)         ; Create a new overlay at the current point
+                      position))
+
+  (overlay-put overlay 'face 'region-cursor) ; Give the new overlay its 'face
+  (overlay-put overlay 'priority 10)         ; Make sure the new overlay overrides mark-mode's
+
+  (setq rc-overlays                          ; Append the new overlay to the list of current overlays
+        (cons overlay
+              rc-overlays)))
+
+;; Moves an overlay to the current point
+(defun move-rc-overlay (overlay)
+  (setq position
+        (point))                             ; Save the current point
+
+  (move-overlay overlay
+                (- position 1) position)     ; Move the overlay to the new position
+
+  (setq rc-overlays                          ; Append the moved overlay to the list of current overlays
+        (cons overlay rc-overlays)))
+
+;; Highlight the multi-line cursor of the current region
+(defun rc-highlight ()
+  (when (region-active-p)                    ; Ensure we have a region
+
+    (setq cur-col                            ; We want to try and put the cursor in the column to the right
+          (+ 1 (pos-col (point)))            ; of the current column. This makes sure that there's a character
+                                             ; where we draw the overlay
+          unreused-overlays rc-overlays      ; Make a list of the overlays we can still reuse
+
+          rc-overlays nil)                   ; Reset the list of current overlays
+
+    (rc-apply                                ; For every line in the multi-line cursor
+     (lambda ()
+       (move-to-column cur-col)
+
+       (when (eq (pos-col (point))           ; Before we draw an overlay, make sure there's a character
+                 cur-col)                    ; to draw over
+
+         (if (eq nil unreused-overlays)      ; If there are no more reusable overlays,
+             (new-rc-overlay)                ; make a new one
+
+           (move-rc-overlay                  ; Otherwise, move the next reusable overlay,
+            (car unreused-overlays))
+
+           (setq unreused-overlays           ; and remove it from the list of remaining reusable
+                 (cdr unreused-overlays)))))); overlays
+
+    (dolist (overlay unreused-overlays)      ; For every remaining reusable overlay
+      (delete-overlay overlay))))            ; Kill it
+
+
+;; A new face for the position of a multi-line pointer in a region
+(defface region-cursor
+  '((t :background "color-163"))
+  "Face for multi-line cursor")
+
+;; A variable for keeping track of the highlighted overlays of a multi-line cursor
+(defvar rc-overlays nil)
+
+;; A keymap for the new minor-mode
+(defvar rc-keymap
+  '(keymap
+    (remap keymap
+           (c-electric-backspace
+            . rc-backspace)
+
+           (backward-delete-char-untabify    ; Map (usually)backspace key to rc-backspace
+            . rc-backspace)
+
+           (self-insert-command              ; Remap any character insertion to rc-insert-command
+            . rc-insert-command))))
+
+;; Actually define our minor mode
+(define-minor-mode region-cursor-mode
+  "A minor mode where the region acts as a tall cursor"
+  :keymap
+  rc-keymap)
+(rc-highlight)
+
+;; Hooks for our minor-mode
+(add-hook 'region-cursor-mode-hook
+          (lambda ()
+            (when region-cursor-mode
+              (add-hook
+               'post-command-hook
+               'rc-highlight))
+
+            (when (not region-cursor-mode)
+              (remove-hook
+              'post-command-hook
+              'rc-highlight)
+
+              (kill-rc-overlays))))
+
+;; Hooks to enable and disable our minor mode with normal mark activation
+(add-hook 'activate-mark-hook
+          (lambda ()
+            (if (not region-cursor-mode)
+                (call-interactively
+                 'region-cursor-mode))))
+
+(add-hook 'deactivate-mark-hook
+          (lambda ()
+            (if region-cursor-mode
+                (call-interactively
+                 'region-cursor-mode))))
+
+
+;;-------------------------------------------;;
+;; Other functions changing region behavior  ;;
+;;-------------------------------------------;;
+
+;; This is convenient. Also things don't work without it
+(rectangle-mark-mode t)
 
 ;; Shift the current region by an amount of lines and columns
+
 (defun region-shift (lines cols)
   (interactive
    "nMove down #lines:\nnMove #chars: ")
@@ -84,324 +264,109 @@
     (goto-line                               ; Go to the cursor's new position
      (+ lines (pos-line old-point)))
     (move-to-column
-     (+ cols  (pos-col  old-point)))
-
-    (setq deactivate-mark nil)))             ; Ensure our new region doesn't get killed
-
-
-
-
-
-;; Shift the region one character up
-(defun region-shift-up ()
-  (interactive)
-  (region-shift -1  0))
-
-
-
-;; Shift the region one character down
-(defun region-shift-down ()
-  (interactive)
-  (region-shift  1  0))
-
-
-
-;; Shift the region one character to the left.
-(defun region-shift-left ()
-  (interactive)
-  (region-shift  0 -1))
-
-
-
-;; Shift the region one character to the right.
-(defun region-shift-right ()
-  (interactive)
-  (region-shift  0  1))
-
-
-
-
-
-;; Get the line a particular position is on
-(defun pos-line (position)
-  (save-excursion                            ; Ensure nothing is affected by moving the cursor
-    (goto-char position)                     ; Go to the correct position
-    (beginning-of-line)                      ; and the start of the line
-    (+ 1 (count-lines 1 (point)))))          ; Count the lines up
-
-
-
-;; Get the column a particular position is in
-(defun pos-col (position)
-  (save-excursion                            ; Ensure nothing is affected by moving the cursor
-    (goto-char position)                     ; Go to the correct position
-    (current-column)))                       ; Return the current column
-
-
-
-
-
-;; To be called from a hook - Inserts the calling command key(s) at the start
-;; of every line of the current selected region rectangle.
-(defun region-apply (funct)
-  (setq col
-        (current-column)                     ; The column of the point is where we will insert.
-
-        end-line
-        (pos-line (min (window-end)
-                       (region-end)))        ; Get the last line of the region
-
-        start-line
-        (pos-line (max (window-start)
-                       (region-beginning)))  ; Get the first line of the region
-
-        orig-pos
-        (point))
-
-  (goto-line end-line)                       ; Go to the end line of the region
-  (move-to-column col)                       ; and the column of the cursor
-
-  (if (eq (current-column) col)              ; If a cursor can be placed in the correct column of
-      (funcall funct))                       ; the first line of the region, call funct
-
-  (while (> (pos-line (point))               ; For every line in the region, going upwards
-            start-line)                      ; this way we avoid changes on prior lines affecting later ones
-    (forward-line -1)
-    (move-to-column col)
-    (if (eq (current-column) col)            ; If a cursor can be placed in the correct column of each line
-        (funcall funct)))                    ; call funct
-
-  (goto-char orig-pos)
-
-
-
-
-
-;; Squishes a region down to a width of 1. Used after region-insert etc.
-;; To make the region look like a multi-line cursor thing.
-(defun region-cursorify ()
-  (goto-line end-line)                       ; Go to the last line and column of the user's cursor
-  (move-to-column col)
-  (set-mark (point))                         ; Set this point as one end of the new region
-
-  (goto-line start-line)
-  (move-to-column col)                       ; Go to the first line
-
-  (setq deactivate-mark nil))                ; Don't delete the region after
-
-
-
-
-
-;; Inserts a single character on every line of a region acting as a multi-line cursor
-(defun region-insert-char (char)
-  (interactive "cCharacter to insert?")      ; This could be useful to call via M-x sometime...
-
-  (when (eq 1 (length char))                 ; Check that we are indeed inserting a single character
-
-    (region-apply (lambda ()                 ; Insert the character on every line of the multi-line cursor
-                    (insert char)))
-
-    (region-cursorify)                       ; Squish the region
-    (forward-char)))                         ; Go forward a character so we are in front of what we inserted
-
-
-
-;; To be called from a keypress when a region is acting as a multiline cursor
-;; Takes the keypress that called it and inserts it on every line of the region in the cursor's column
-(defun region-insert ()
-  (when (region-active-p)                    ; Ensure we are dealing with an actual region
-    (delete-char -1)                         ; Get rid of the character inserted by the keypress
-    (region-insert-char
-     (concat (this-command-keys)))))         ; Insert the keypresses that called this function
-
-
-
-
-
-;; Causes the region to act as a multi-line cursor and delete the characters in the column behind the cursor
-(defun region-backspace ()
-  (interactive)
-
-  (when (region-active-p)                    ; Ensure we actually have a region
-    (setq orig-mode delete-active-region)    ; Save the original mode of delete-active-region
-    (setq delete-active-region nil)          ; Make it do we do not delete everything in the region
-
-    (backward-char)                          ; Go backwards
-    (region-apply (lambda ()
-                    (delete-forward-char 1))); Delete the charater in front of the cursor on each line
-
-    (region-cursorify)                       ; Squish the region into a multi-line cursor looking thing
-
-    (setq delete-active-region orig-mode)))  ; Reset delete-active-region to its original mode (probably t)
-
-
-
-
+     (+ cols  (pos-col  old-point)))))
+
+;; Bind different shift directions to keys
+(define-key rectangle-mark-mode-map (kbd "ESC <up>")    (lambda () (region-shift -1  0)))
+(define-key rectangle-mark-mode-map (kbd "ESC <down>")  (lambda () (region-shift  1  0)))
+(define-key rectangle-mark-mode-map (kbd "ESC <left>")  (lambda () (region-shift  0 -1)))
+(define-key rectangle-mark-mode-map (kbd "ESC <right>") (lambda () (region-shift  0  1)))
 
 ;; Squishes a region to a width of 1 and justifies it right
-(defun region-snap-right ()
-  (interactive)
+(defun region-snap (direction)
   (when (and (region-active-p)               ; Ensure we have an active region to play with
              rectangle-mark-mode)            ; ensure it's also rectangular.
 
-    (if (> (pos-col (mark))                  ; If the mark is in a greater column
-           (pos-col (point)))
+    (setq mark-col                           ; Save the column of the mark
+          (pos-col (mark))
 
-        (move-to-column (pos-col (mark)))    ; Put the point in the mark-s column
+          point-col                          ; and the point
+          (pos-col (point)))
 
-      (setq old-pos                          ; Otherwise, save the point for later
-            (point))
+    (if (or (and (eq direction 'left)        ; If we're snapping to the left
+                 (> point-col mark-col))     ; and the point is to the left of the mark
+            (and (eq direction 'right)       ; or we're snapping right
+                 (< point-col mark-col)))    ; and the point is to the right of the mark
 
-      (goto-char (mark))                     ; Go to the line of the mark,
-      (move-to-column (pos-col old-pos))     ; and the column of the point
+        (move-to-column mark-col)            ; we can just move the point to the mark's column
 
-      (set-mark-command nil)                 ; Set this as the new mark
-
-      (goto-char old-pos))))                 ; Return the point to its original position
-
-;;;; TODO: region-snap-left ;;;;
-
-
-
+      (set-mark (save-excursion              ; Otherwise, we need to move the mark. To get its new position,
+                  (goto-char (mark))         ; we need to move a pretend point to the mark's current position
+                  (move-to-column point-col) ; then move the point to the mark's new column
+                  (point))))))               ; and get the point's position.
 
 
-;; A new face for the position of a multi-line pointer in a region
-(defface region-cursor
-  '((t :background "color-163"))
-  "Face for highlighting the character after a rectangle region")
+;; Bind different snap directions to keys
+(define-key rectangle-mark-mode-map (kbd "ESC <end>")   (lambda () (region-snap 'right)))
+(define-key rectangle-mark-mode-map (kbd "ESC <home>")  (lambda () (region-snap 'left)))
 
-;; A variable for keeping track of the highlighted overlays of a multi-line cursor
-(defvar region-cursor-overlays nil)
+;; Display the sze of the currently selected region. Updates when the last
+;; command was acursor move.
+(defun region-stats ()
+  (interactive)
 
-
-
-;; Kills all current multi-line cursor overlays
-(defun kill-region-cursor-overlays ()
-  (dolist (overlay region-cursor-overlays)   ; For every current overlay
-    (delete-overlay overlay))                ; delete the overlay, so it stops displaying
-
-  (setq region-cursor-overlays nil))         ; Set the list of current overlays to '()
-
-
-
-;; Adds a new multi-line cursor overlay at the current point
-(defun new-region-cursor-overlay ()
-  (setq position                             ; Save the current point
-        (point)
-
-        overlay
-        (make-overlay (- position 1)         ; Create a new overlay at the current point
-                      position))
-
-  (overlay-put overlay 'face 'region-cursor) ; Give the new overlay its 'face
-  (overlay-put overlay 'priority 10)         ; Make sure the new overlay overrides mark-mode's
-
-  (setq region-cursor-overlays               ; Append the new overlay to the list of current overlays
-        (cons overlay
-              region-cursor-overlays)))
+  (if (and (region-active-p)                 ; Check that a valid region is selected.
+           (or
+            (eq this-command 'previous-line) ; Check that the last command was a move.
+            (eq this-command 'next-line)
+            (eq this-command 'right-char)
+            (eq this-command 'left-char)))
+  (call-interactively
+   'count-words-region)))                    ; The gorramn command.
 
 
-
-;; Moves an overlay to the current point
-(defun move-region-cursor-overlay (overlay)
-  (setq position
-        (point))                             ; Save the current point
-
-  (move-overlay overlay
-                (- position 1) position)     ; Move the overlay to the new position
-
-  (setq region-cursor-overlays               ; Append the moved overlay to the list of current overlays
-        (cons overlay
-              region-cursor-overlays)))
-
-
-
-;; Highlight the multi-line cursor of the current region
-(defun region-cursor-highlight ()
-  (when (region-active-p)                    ; Ensure we have a region
-
-    (setq cur-col                            ; We want to try and put the cursor in the column to the right
-          (+ 1 (pos-col (point)))            ; of the current column. This makes sure that there's a character
-                                             ; where we draw the overlay
-
-          unreused-overlays                  ; Make a list of the overlays we can still reuse
-          region-cursor-overlays
-
-          region-cursor-overlays             ; Reset the list of current overlays
-          nil)
-
-    (region-apply                            ; For every line in the multi-line cursor
-     (lambda ()
-       (move-to-column cur-col)
-
-       (when (eq (pos-col (point))           ; Before we draw an overlay, make sure there's a character
-                 cur-col)                    ; to draw over
-
-         (if (eq nil unreused-overlays)      ; If there are no more reusable overlays,
-             (new-region-cursor-overlay)     ; make a new one
-
-           (move-region-cursor-overlay       ; Otherwise, move the next reusable overlay,
-            (car unreused-overlays))
-
-           (setq unreused-overlays           ; and remove it from the list of remaining reusable
-                 (cdr unreused-overlays)))))); overlays
-
-    (dolist (overlay unreused-overlays)      ; For every remaining reusable overlay
-      (delete-overlay overlay))              ; Kill it
-
-    (setq deactivate-mark nil)))             ; Don't deactivate the active region
-
-
-
-
-
-(rectangle-mark-mode t)
-
-(define-key rectangle-mark-mode-map (kbd "ESC <up>")    'region-shift-up)
-(define-key rectangle-mark-mode-map (kbd "ESC <left>")  'region-shift-left)
-(define-key rectangle-mark-mode-map (kbd "ESC <right>") 'region-shift-right)
-(define-key rectangle-mark-mode-map (kbd "ESC <next>")  'region-snap-right)
-
-
-
+;; Hooks to enable and disable region-stats with mark activation
 (add-hook 'activate-mark-hook
           (lambda ()
             (add-hook
-               'post-self-insert-hook
-               'region-insert)
-
-            (add-hook
              'post-command-hook
-             'region-stats)
-
-            (add-hook
-             'post-command-hook
-             'region-cursor-highlight)
-
-            (define-key (current-global-map) [remap backward-delete-char-untabify] 'region-backspace)))
-
-
+             'region-stats)))
 
 (add-hook 'deactivate-mark-hook
           (lambda ()
             (remove-hook
-               'post-self-insert-hook
-               'region-insert)
-
-            (remove-hook
              'post-command-hook
-             'region-stats)
+             'region-stats)))
 
-            (remove-hook
-             'post-command-hook
-             'region-cursor-highlight)
+;;-------------------------------------------;;
+;; General configuration stuff               ;;
+;;-------------------------------------------;;
 
-            (kill-region-cursor-overlays)
+(setq tetris-score-file                      ; Tetris is important for productivity
+      "~/.emacs.d/tetrisscores"
 
-            (define-key (current-global-map) [remap backward-delete-char-untabify] nil)))
+      c-default-style                        ; Linux style is important,
+      "linux"                                ; does fuck up #defines tho...
 
+      debug-on-error                         ; Just so we can figure out when things catch fire
+      t
 
+;;    debug-ignored-errors                   ; Uncomment for every goddamn error to produce tracebacks etc.
+;;    nil
+
+      delete-active-region                   ; We can always C-x u
+      t)
+
+(column-number-mode t)                       ; HOW DO WE ALIGN OTHERWISE ;-;
+
+(set-face-attribute 'show-paren-match nil
+                    :background "#999"
+                    :foreground "#fff")      ; Gray brackets :D
+
+(setq show-paren-delay 0)                    ; Why do you even do that by default ;-;
+(show-paren-mode 1)                          ; This is entirely necessary if using either grace's code or lisp
+
+(setq whitespace-style
+      '(face trailing tabs tab-mark))        ; Dunno what these do exactly,
+(global-whitespace-mode 1)                   ; but they seem important
+
+(setq-default indent-tabs-mode nil             ; Tabs master race
+              tab-width 4)                   ; Seriously, 8 spaces is massive, why would you ever use
+
+(setq c-basic-offset 4
+	  cperl-indent-level 4)
+;(defvaralias 'c-basic-offset     'tab-width) ; it. 4 is so, so much better.
+;(defvaralias 'cperl-indent-level 'tab-width)
 
 (add-hook 'html-mode-hook
 (add-hook 'emacs-lisp-mode
@@ -409,16 +374,12 @@
           (lambda ()
             (setq indent-tabs-mode nil)))))
 
-
-
 (add-hook 'javascript-mode-hook
 (add-hook 'python-mode-hook
           (lambda ()
             (setq indent-tabs-mode t)
             (setq python-indent 4)
             (setq tab-width 4))))
-
-
 
 (global-set-key (kbd "M-SPC") 'rectangle-mark-mode)
 (global-set-key (kbd "C-e")   'exchange-point-and-mark)
