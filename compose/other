@@ -4,3 +4,79 @@
 
 # Zero width space
 <Multi_key> <space> : "​" U200B
+include "%L"
+
+#Logic
+<Multi_key> <l> <I>              : "⇒"
+<Multi_key> <l> <i>              : "→"
+<Multi_key> <l> <S>              : "⊃"
+<Multi_key> <l> <underscore>     : "⇔"
+<Multi_key> <l> <equal>          : "≡"
+<Multi_key> <l> <exclam> <equal> : "≢"
+<Multi_key> <l> <minus>          : "↔"
+<Multi_key> <l> <n>              : "¬"
+<Multi_key> <l> <x>              : "⊕"
+<Multi_key> <l> <t>              : "⊤"
+<Multi_key> <l> <a>              : "∀"
+<Multi_key> <l> <e>              : "∃"
+<Multi_key> <l> <d>              : "≔"
+<Multi_key> <l> <p>              : "⊢"
+<Multi_key> <l> <P>              : "⊨"
+<Multi_key> <l> <m>              : "·" 
+<Multi_key> <l> <T>              : "∴"
+<Multi_key> <l> <b>              : "∵"
+<Multi_key> <l> <f>              : "∝"
+
+#Set theory
+<Multi_key> <s> <8>          : "∞"
+<Multi_key> <s> <e>          : "∈"
+<Multi_key> <s> <E>          : "∉"
+<Multi_key> <s> <0>          : "Ø"
+<Multi_key> <s> <n>          : "ℕ"
+<Multi_key> <s> <z>          : "ℤ"
+<Multi_key> <s> <q>          : "ℚ"
+<Multi_key> <s> <r>          : "ℝ"
+<Multi_key> <s> <c>          : "ℂ"
+<Multi_key> <s> <a>          : "ℵ"
+<Multi_key> <s> <s>          : "⊆"
+<Multi_key> <s> <S>          : "⊂"
+<Multi_key> <s> <p>          : "⊇"
+<Multi_key> <s> <P>          : "⊃"
+<Multi_key> <s> <exclam> <s> : "⊈"
+<Multi_key> <s> <exclam> <S> : "⊄"
+<Multi_key> <s> <exclam> <p> : "⊉"
+<Multi_key> <s> <exclam> <P> : "⊅"
+<Multi_key> <s> <i>          : "⋂"
+<Multi_key> <s> <u>          : "⋃"
+
+#Calculus
+<Multi_key> <c> <i> : "∫"
+<Multi_key> <c> <I> : "∮"
+<Multi_key> <c> <s> : "∑"
+<Multi_key> <c> <t> : "⨂"
+
+#Calculus multiples
+<Multi_key> <c> <1> <i> : "∫"
+<Multi_key> <c> <2> <i> : "∬"
+<Multi_key> <c> <3> <i> : "∭"
+<Multi_key> <c> <4> <i> : "⨌"
+<Multi_key> <c> <1> <I> : "∮"
+<Multi_key> <c> <2> <I> : "∯"
+<Multi_key> <c> <3> <I> : "∰"
+
+#General math
+<Multi_key> <m> <s>      : "√"
+<Multi_key> <m> <2> <s>  : "√"
+<Multi_key> <m> <3> <s>  : "∛"
+<Multi_key> <m> <4> <s>  : "∜"
+<Multi_key> <m> <comma>  : "≤"
+<Multi_key> <m> <period> : "≥"
+<Multi_key> <m> <plus>   : "±"
+<Multi_key> <m> <minus>  : "∓"
+
+#Geometry
+<Multi_key> <y> <a>          : "∠"
+<Multi_key> <y> <p>          : "∥"
+<Multi_key> <y> <exclam> <p> : "∦"
+<Multi_key> <y> <r>          : "∟"
+<Multi_key> <y> <R>          : "⟂"
