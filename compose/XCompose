@@ -1,2 +1,3 @@
 include "%L"
 include "%H/etc/compose/greek"
+include "%H/etc/compose/other"
