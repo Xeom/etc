@@ -39,10 +39,9 @@ if [[ $(tty | grep -xP "/dev/tty\d+") ]]; then
 	PS1='\h » \w \$ '
 
 else
-	ps1_col1=$(( $RANDOM % 6 + 1 ))
-	ps1_col2=$(( $RANDOM % 6 + 1 ))
-
-	PS1='\[\e[0;4${ps1_col1}m\] \h \[\e[0;4${ps1_col2};3${ps1_col1}m\]⮀\[\e[1;30m\] \w \[\e[0;3${ps1_col2}m\]⮀\[\e[0m\]\n '
+	PS2="\[\e[38;2;255;160;30m\] » \[\e[0m\]"
+    PS1="\$(lprompt)\n"
+	PS1+=$PS2
 fi
 
 alias ls='ls --color=auto'
@@ -72,3 +71,27 @@ fi
 if [[ -n $TMUX ]]; then
 	TERM=screen-256color
 fi
+
+echo -e "
+
+               \e[42m      \e[49m          \e[42m      \e[49m
+               \e[42m        \e[49m        \e[42m      \e[49m
+               \e[42m        \e[49m        \e[42m      \e[49m
+               \e[42m        \e[49m  \e[42m            \e[49m
+         \e[42m                            \e[49m
+         \e[42m                            \e[49m        \e[44m  \e[49m
+         \e[42m          \e[44m  \e[42m       \e[44m  \e[42m       \e[49m        \e[44m  \e[49m
+         \e[42m        \e[44m  \e[42m           \e[44m  \e[42m     \e[49m       \e[44m    \e[49m
+          \e[42m     \e[44m  \e[42m               \e[44m  \e[42m   \e[49m        \e[44m  \e[49m
+          \e[42m   \e[44m  \e[42m   \e[44m    \e[42m     \e[44m    \e[42m   \e[44m  \e[42m \e[49m        \e[44m  \e[49m
+          \e[42m                           \e[49m        \e[44m  \e[49m
+          \e[42m                             \e[44m        \e[49m
+      \e[44m  \e[42m           \e[44m          \e[42m          \e[49m
+    \e[44m  \e[49m  \e[42m                               \e[49m
+  \e[44m  \e[49m    \e[42m                               \e[49m
+  \e[44m  \e[49m    \e[42m                               \e[49m
+        \e[42m                               \e[49m
+        \e[42m                               \e[49m
+                    \e[44m  \e[49m    \e[44m  \e[49m
+                \e[44m      \e[49m    \e[44m      \e[49m
+                                                  "

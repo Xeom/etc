@@ -1,10 +1,9 @@
 # Pretty exponents
-<asciicircum> <j> : "ⁱ" U2071
-<asciicircum> <n> : "ⁿ" U207F
+<Multi_key> <asciicircum> <j> : "ⁱ" U2071
+<Multi_key> <asciicircum> <n> : "ⁿ" U207F
 
 # Zero width space
 <Multi_key> <space> : "​" U200B
-include "%L"
 
 #Logic
 <Multi_key> <l> <I>              : "⇒"
@@ -80,3 +79,11 @@ include "%L"
 <Multi_key> <y> <exclam> <p> : "∦"
 <Multi_key> <y> <r>          : "∟"
 <Multi_key> <y> <R>          : "⟂"
+
+# Political
+<Multi_key> <U> <S> <S> <R>     : "☭"
+<Multi_key> <J> <e> <w> <s>     : "✡"
+<Multi_key> <D> <a> <o>         : "☯"
+<Multi_key> <C> <r> <o> <s> <s> : "✝"
+
+<Multi_key> <tilde> <tilde> : "̃"

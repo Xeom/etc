@@ -1,0 +1,58 @@
+[global]
+	font = Sans 9
+
+	allow_markup = yes
+
+	format = "<i>%a</i> - <b>%s</b>\n%b"
+	geometry = "300x0+10+10"
+	padding = 8
+	horizontal_padding = 8
+	separator_color = "#303030"
+	separator_height = 5
+	shrink = no
+	word_wrap = yes
+
+	alignment = right
+	icon_position = right
+	
+[frame]
+	width = 1
+	color = "#217867"
+
+[urgency_low]
+	background = "#303030"
+	foreground = "#217867"
+	icon = /home/xeom/etc/dunst/icon/blank.pngz
+
+[urgency_normal]
+	background = "#303030"
+	foreground = "#5fd3bc"
+	icon = /home/xeom/etc/dunst/icon/blank.png
+
+[urgency_critical]
+	background = "#303030"
+	foreground = "#ffffff"
+	icon = /home/xeom/etc/dunst/icon/critical.png
+
+
+[lnotifyhandle]
+	script = lnotifyhandle
+
+
+
+[network_event]
+	appname = NetworkManager
+	urgency = normal
+	new_icon = /home/xeom/etc/dunst/icon/wireless.png
+	
+[spotify_event]
+	appname = Spotify
+	urgency = normal
+	format = "<i>Track</i>: %s\n<i>Album</i>: %b"
+	new_icon = /home/xeom/etc/dunst/icon/spotify.png
+
+[mute_event]
+	appname = notify-send
+	body = *Muted Audio
+	script =
+	new_icon = /home/xeom/etc/dunst/icon/mute.png

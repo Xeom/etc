@@ -332,6 +332,9 @@
 ;; General configuration stuff               ;;
 ;;-------------------------------------------;;
 
+(add-to-list 'load-path "~/src/gnu-apl-mode")
+(require 'gnu-apl-mode)
+
 (setq tetris-score-file                      ; Tetris is important for productivity
       "~/.emacs.d/tetrisscores"
 
@@ -392,3 +395,5 @@
 (global-set-key "\e[C" [right])
 (global-set-key "\eOD" [left])
 (global-set-key "\e[D" [left])
+
+(global-set-key (kbd "M-O p") (kbd "H-"))
